@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سیستەمی تاقیکردنەوەی هاتووچۆ</title>
+    <style>
+        /* --- CSS (No significant change, kept for completeness) --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            transition: direction 0.4s, text-align 0.4s;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .lang-selection {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .lang-btn {
+            padding: 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .lang-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .id-entry {
+            display: none;
+        }
+
+        .display-box {
+            background: #f7f7f7;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            min-height: 80px; 
+        }
+
+        .name-display {
+            color: #10b981; 
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: normal;
+        }
+
+        .numpad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .num-btn {
+            padding: 20px;
+            font-size: 24px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .num-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .num-btn:active {
+            transform: scale(0.95);
+        }
+
+        .action-btn {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .confirm-btn {
+            background: #10b981;
+            color: white;
+        }
+        
+        /* شێوازی ناچالاک بۆ دوگمەی دڵنیاکردنەوە */
+        .confirm-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .confirm-btn:hover:not(:disabled) {
+            background: #059669;
+        }
+
+        .quiz-container {
+            display: none;
+        }
+
+        .question-box {
+            background: #f7f7f7;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .timer {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ef4444;
+        }
+
+        .question-text {
+            font-size: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .traffic-sign {
+            text-align: center;
+            font-size: 80px;
+            margin: 20px 0;
+        }
+
+        .answers {
+            display: grid;
+            gap: 10px;
+        }
+
+        .answer-btn {
+            padding: 15px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .answer-btn:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .answer-btn.correct {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+
+        .answer-btn.wrong {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+
+        .result-container {
+            display: none;
+            text-align: center;
+        }
+
+        .result-emoji {
+            font-size: 100px;
+            margin: 20px 0;
+        }
+
+        .result-text {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .score {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+
+        .restart-btn {
+            background: #667eea;
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .restart-btn:hover {
+            background: #764ba2;
+        }
+        
+        /* RTL/LTR Adjustments */
+        body[dir="ltr"] .answer-btn {
+            text-align: left;
+        }
+        body[dir="rtl"] .answer-btn {
+            text-align: right;
+        }
+    </style>
+</head>
+<body dir="rtl">
+    <div class="container">
+        
+        <div class="lang-selection" id="langSelection">
+            <h1 style="grid-column: 1/-1;">هەڵبژاردنی زمان / اختر اللغة / Select Language</h1>
+            <button class="lang-btn" onclick="selectLanguage('sorani')">کوردی (سۆرانی)</button>
+            <button class="lang-btn" onclick="selectLanguage('badini')">کوردی (بادینی)</button>
+            <button class="lang-btn" onclick="selectLanguage('arabic')">العربية</button>
+            <button class="lang-btn" onclick="selectLanguage('english')">English</button>
+        </div>
+
+        <div class="id-entry" id="idEntry">
+            <h1 id="pageTitle">داخڵکردنی ژمارەی ناسنامە</h1>
+            
+            <div class="display-box">
+                <div id="idDisplay">___</div>
+                <div class="name-display" id="nameDisplay"></div>
+            </div>
+            
+            <div class="numpad">
+                <button class="num-btn" onclick="addDigit('1')">1</button>
+                <button class="num-btn" onclick="addDigit('2')">2</button>
+                <button class="num-btn" onclick="addDigit('3')">3</button>
+                <button class="num-btn" onclick="addDigit('4')">4</button>
+                <button class="num-btn" onclick="addDigit('5')">5</button>
+                <button class="num-btn" onclick="addDigit('6')">6</button>
+                <button class="num-btn" onclick="addDigit('7')">7</button>
+                <button class="num-btn" onclick="addDigit('8')">8</button>
+                <button class="num-btn" onclick="addDigit('9')">9</button>
+                <button class="num-btn" onclick="clearEntry()">C</button>
+                <button class="num-btn" onclick="addDigit('0')">0</button>
+                <button class="num-btn" onclick="backspace()">⌫</button>
+            </div>
+            
+            <button class="action-btn confirm-btn" onclick="confirmID()" id="confirmBtn" disabled>دڵنیاکردنەوە</button>
+            <p id="verificationMessage" style="text-align: center; color: red; margin-top: 10px;"></p>
+        </div>
+
+        <div class="quiz-container" id="quizContainer">
+            <h1 id="quizTitle">تاقیکردنەوەی هاتووچۆ</h1>
+            <div class="question-box">
+                <div class="question-header">
+                    <span class="question-number" id="questionNumber">پرسیار 1/25</span>
+                    <span class="timer" id="timer">60s</span>
+                </div>
+                <div class="traffic-sign" id="trafficSign"></div>
+                <div class="question-text" id="questionText"></div>
+                <div class="answers" id="answersContainer"></div>
+            </div>
+        </div>
+
+        <div class="result-container" id="resultContainer">
+            <h1 id="resultTitle">ئەنجامی تاقیکردنەوە</h1>
+            <div class="result-emoji" id="resultEmoji">🎉</div>
+            <div class="result-text" id="resultText">پیرۆزە! سەرکەوتوو بوویت</div>
+            <div class="score" id="scoreDisplay">25/25</div>
+            <button class="restart-btn" onclick="restart()" id="restartBtn">دەستپێکردنەوە</button>
+        </div>
+    </div>
+
+    <script>
+        /* --- JAVASCRIPT LOGIC --- */
+        let currentLang = '';
+        let currentID = '';
+        let currentQuestion = 0;
+        let score = 0;
+        let timerInterval;
+        let timeLeft = 60; 
+        
+        // --- ئامانجی پرسیار و دەرچوون گۆڕدرا ---
+        const totalQuestions = 25; // ٢٥ پرسیار
+        const passingScore = 20; // دەرچوون بە ٢٠ ڕاست
+
+        // --- ئۆبجێکتی وەرگێڕان ---
+        const translations = {
+            sorani: {
+                dir: 'rtl', langCode: 'ku', title: 'داخڵکردنی ژمارەی ناسنامە', confirm: 'دڵنیاکردنەوە', quizTitle: 'تاقیکردنەوەی هاتووچۆ',
+                question: 'پرسیار', resultTitle: 'ئەنجامی تاقیکردنەوە', passed: `پیرۆزە! سەرکەوتوو بوویت. پێویستە ${passingScore} ڕاست بکەیت، تۆ ${score} ڕاستت کرد.`,
+                failed: `داخەوە! سەرکەوتوو نەبوویت. پێویستە ${passingScore} ڕاست بکەیت.`, restart: 'دەستپێکردنەوە', enterName: 'تکایە ژمارەی ناسنامە داخڵ بکە',
+                notFound: 'ناسنامە نەدۆزرایەوە', thirdName: (third, full) => `پشتڕاستکرایەوە! ناوی سێیەم: ${third} (${full})`,
+                verificationSuccess: 'ناسنامە دروستە و ناوی سیانی پشتڕاست کرایەوە', verificationFailed: 'ناسنامە نادروستە', timeUp: 'کات کۆتایی هات! (هەڵە هەژمار کرا)',
+                almost: 'نزیک بوویتەوە، بەڵام پێویستت بە خوێندنەوەی زیاترە.'
+            },
+            badini: {
+                dir: 'rtl', langCode: 'ku', title: 'داخلکرنا ژمارا ناسنامێ', confirm: 'پشتراستکرن', quizTitle: 'تاقیکرنا هاتچۆیێ',
+                question: 'پرسیار', resultTitle: 'ئەنجاما تاقیکرنێ', passed: `پیرۆز بت! سەرکەفتی. پێتڤی بوو ${passingScore} دروست بکەی، تە ${score} دروست کر.`,
+                failed: `ببورە! سەرکەفتی نەبوویت. پێتڤی بوو ${passingScore} دروست بکەی.`, restart: 'دەستپێکرنا نوێ', enterName: 'تکایە ژمارا ناسنامێ داخل کە',
+                notFound: 'ناسنامێ نه‌دیار', thirdName: (third, full) => `پشتراستکرن! ناڤێ سێیێ: ${third} (${full})`,
+                verificationSuccess: 'ناسنامە دروستە و ناڤێ سێیێ پشتراست کریە', verificationFailed: 'ناسنامە نه‌دروسته‌', timeUp: 'دەمی ب دوماهی هات! (خەلەتی هەژمار کرا)',
+                almost: 'نێزیک بووی، لێ پێتڤی ب خواندنەکا زێدەترە.'
+            },
+            arabic: {
+                dir: 'rtl', langCode: 'ar', title: 'إدخال رقم الهوية', confirm: 'تأكيد', quizTitle: 'اختبار المرور',
+                question: 'سؤال', resultTitle: 'نتيجة الاختبار', passed: `مبروك! لقد نجحت. يجب أن تحصل على ${passingScore} إجابة صحيحة، وحصلت على ${score}.`,
+                failed: `للأسف! لم تنجح. يجب أن تحصل على ${passingScore} إجابة صحيحة.`, restart: 'إعادة البدء', enterName: 'الرجاء إدخال رقم الهوية',
+                notFound: 'رقم الهوية غير موجود', thirdName: (third, full) => `تم التأكيد! الاسم الثالث: ${third} (${full})`,
+                verificationSuccess: 'تم التحقق من الهوية والاسم الثلاثي بنجاح', verificationFailed: 'رقم الهوية غير صحيح', timeUp: 'انتهى الوقت! (احتسب خطأ)',
+                almost: 'كنت قريباً، لكنك تحتاج إلى المزيد من الدراسة.'
+            },
+            english: {
+                dir: 'ltr', langCode: 'en', title: 'Enter ID Number', confirm: 'Confirm', quizTitle: 'Traffic Test',
+                question: 'Question', resultTitle: 'Test Result', passed: `Congratulations! You Passed. Required ${passingScore} correct, you got ${score}.`,
+                failed: `Sorry! You Failed. Required ${passingScore} correct answers.`, restart: 'Restart', enterName: 'Please enter ID number',
+                notFound: 'ID number not found', thirdName: (third, full) => `Verified! Third Name: ${third} (${full})`,
+                verificationSuccess: 'ID is correct and third name is verified', verificationFailed: 'Invalid ID number', timeUp: 'Time is up! (Counted as wrong)',
+                almost: 'You were close, but you need more study.'
+            }
+        };
+
+        // --- داتابەیسی بەکارهێنەران (پێویستە ناوی سیانی بێت) ---
+        const users = {
+            '123': {
+                sorani: 'ئەیوب حەسەن محەمەد', badini: 'ئەیوب حەسەن محەمەد', arabic: 'أيوب حسن محمد', english: 'Ayub Hasan Muhammad'
+            },
+            '677': {
+                sorani: 'عەزیز ئەحمەد ساڵح', badini: 'عەزیز ئەحمەد ساڵح', arabic: 'عزيز أحمد صالح', english: 'Aziz Ahmad Salih'
+            },
+            '456': {
+                sorani: 'سارا ئیبراهیم عەلی', badini: 'سارا ئیبراهیم عەلی', arabic: 'سارة إبراهيم علي', english: 'Sara Ibrahim Ali'
+            },
+            '789': {
+                sorani: 'مامۆستا عمر سدیق', badini: 'مامۆستا عمر سدیق', arabic: 'استاذ عمر صديق', english: 'Teacher Omer Sdiq'
+            },
+        };
+        
+        // --- پرسیارەکان (زیاد کراون بۆ 10 پرسیاری ناوازە، بۆ ئەوەی بەسەر 25 پرسیاردا بسووڕێنەوە) ---
+        const questions = [
+            {
+                sign: '🛑', 
+                sorani: {question: 'ئەم هێمایە چی دەگەیەنێت؟', answers: ['وەستان', 'خێرایی کەم', 'ڕێگە پێدان'], correct: 0},
+                badini: {question: 'ڤێ هێمایێ چ رامان هەیە؟', answers: ['راوستن', 'بلەز بڕۆ', 'رێپێدان'], correct: 0},
+                arabic: {question: 'ماذا تعني هذه الإشارة؟', answers: ['توقف إجباري', 'تخفيف السرعة', 'مرور مسموح'], correct: 0},
+                english: {question: 'What does this sign mean?', answers: ['Mandatory STOP', 'Reduce Speed', 'Permission to Pass'], correct: 0}
+            },
+            {
+                sign: '⚠️', 
+                sorani: {question: 'ئەم هێمایە چی دەگەیەنێت؟', answers: ['ئاگاداری', 'وەستان', 'خێرایی زیادکردن'], correct: 0},
+                badini: {question: 'ڤێ هێمایێ چ ڕامان هەیە؟', answers: ['ئاگه‌هدارى', 'راوستن', 'بلەز بڕۆ'], correct: 0},
+                arabic: {question: 'ماذا تعني هذه الإشارة؟', answers: ['تحذير', 'توقف', 'زيادة السرعة'], correct: 0},
+                english: {question: 'What does this sign mean?', answers: ['Warning', 'Stop', 'Increase Speed'], correct: 0}
+            },
+            {
+                sign: '🚦', 
+                sorani: {question: 'کاتێک ترافیک سوورە چی دەکەیت؟', answers: ['دەوەستم', 'بەردەوام دەبم', 'دەبوورمەوە'], correct: 0},
+                badini: {question: 'دەما ترافیک سۆر بیت چ دکەی؟', answers: ['راودەوستم', 'بەردەوام دبم', 'پێش دادەم'], correct: 0},
+                arabic: {question: 'ماذا تفعل عند إضاءة الإشارة الحمراء؟', answers: ['أتوقف تماما', 'أستمر بالحركة', 'أعبر بسرعة'], correct: 0},
+                english: {question: 'What do you do when the traffic light is red?', answers: ['I stop', 'I continue', 'I cross quickly'], correct: 0}
+            },
+            {
+                sign: '↪️', 
+                sorani: {question: 'ئەم هێمایە چی پیشان دەدات؟', answers: ['سووڕانەوە بۆ ڕاست', 'قەدەغەی سوورانەوە', 'ڕێگای ڕاست'], correct: 0},
+                badini: {question: 'ڤێ هێمایێ چ نیشان ددەت؟', answers: ['زڤرین بۆ راستێ', 'قه‌ده‌غه‌ زڤرین', 'رێكا راست'], correct: 0},
+                arabic: {question: 'ماذا تشير هذه الإشارة؟', answers: ['انعطاف إجباري لليمين', 'ممنوع الالتفاف', 'طريق مستقيم'], correct: 0},
+                english: {question: 'What does this sign indicate?', answers: ['Mandatory Right Turn', 'No Turn', 'Straight Road'], correct: 0}
+            },
+            {
+                sign: '🅿️', 
+                sorani: {question: 'ئەم هێمایە بۆ چییە؟', answers: ['پارک کردن', 'وەستان قەدەغەیە', 'ڕێگای چوونە دەرەوە'], correct: 0},
+                badini: {question: 'ئەڤ هێمایە بۆ چی یە؟', answers: ['پارککرن', 'قه‌ده‌غه‌ راوستن', 'رێکا دەرکەفتنێ'], correct: 0},
+                arabic: {question: 'ما هو الغرض من هذه الإشارة؟', answers: ['موقف سيارات', 'ممنوع الوقوف', 'طريق الخروج'], correct: 0},
+                english: {question: 'What is this sign for?', answers: ['Parking Area', 'No Stopping', 'Exit Road'], correct: 0}
+            },
+            {
+                sign: '🚫', 
+                sorani: {question: 'ئەم هێمایە چی دەگەیەنێت؟', answers: ['مەمنووعە', 'تێپەڕین', 'ڕێگە پێدان'], correct: 0},
+                badini: {question: 'ڤێ هێمایێ چ رامان هەیە؟', answers: ['قه‌ده‌غه‌', 'تێپه‌ڕین', 'رێپێدان'], correct: 0},
+                arabic: {question: 'ماذا تعني هذه الإشارة؟', answers: ['ممنوع المرور', 'مرور مسموح', 'إشارة تحذير'], correct: 0},
+                english: {question: 'What does this sign mean?', answers: ['Prohibited/No Entry', 'Allowed Pass', 'Warning Sign'], correct: 0}
+            },
+            {
+                sign: '➡️', 
+                sorani: {question: 'تەنها بۆ کوێ دەتوانی بڕۆی؟', answers: ['ڕاست', 'چەپ و ڕاست', 'تەنها چەپ'], correct: 0},
+                badini: {question: 'تنێ بۆ کوێ دشێی بچی؟', answers: ['راست', 'چه‌پ و راست', 'تنێ چه‌پ'], correct: 0},
+                arabic: {question: 'إلى أين يمكنك الذهاب فقط؟', answers: ['إلى اليمين', 'اليسار واليمين', 'إلى اليسار فقط'], correct: 0},
+                english: {question: 'Where can you only go?', answers: ['Right', 'Left and Right', 'Left Only'], correct: 0}
+            },
+            {
+                sign: '🅿️', // دووبارە دەکرێتەوە بۆ تاقیکردنەوەیەکی درێژتر
+                sorani: {question: 'کاتی وەستان لەم شوێنەدا چەندە؟', answers: ['بە پێی هێماکە', 'بە درێژایی ڕۆژ', 'نیو کاتژمێر'], correct: 0},
+                badini: {question: 'ده‌می راوستنێ ل ڤی جهی چه‌نده‌؟', answers: ['ل گۆری هێمایێ', 'ب درێژاهیا رۆژێ', 'نیڤ کاتژمێر'], correct: 0},
+                arabic: {question: 'كم هي مدة التوقف في هذا المكان؟', answers: ['حسب الإشارة', 'طوال اليوم', 'نصف ساعة'], correct: 0},
+                english: {question: 'What is the stopping time here?', answers: ['According to the sign', 'All day long', 'Half an hour'], correct: 0}
+            },
+            {
+                sign: '🛣️', 
+                sorani: {question: 'شێرترین خێرایی لە ڕێگای دەرەوەی شاردا چەندە؟', answers: ['٨٠-١٠٠ کم/کاژێر', '٦٠ کم/کاژێر', '١٢٠ کم/کاژێر'], correct: 0},
+                badini: {question: 'بلەزترین خێراتی ل رێکا دەرڤەی باژێری چەندە؟', answers: ['٨٠-١٠٠ کم/دەمسژمێر', '٦٠ کم/دەمسژمێر', '١٢٠ کم/دەمسژمێر'], correct: 0},
+                arabic: {question: 'ما هي أقصى سرعة على الطريق الخارجي؟', answers: ['٨٠-١٠٠ كم/ساعة', '٦٠ كم/ساعة', '١٢٠ كم/ساعة'], correct: 0},
+                english: {question: 'What is the maximum speed on an external road?', answers: ['80-100 km/h', '60 km/h', '120 km/h'], correct: 0}
+            },
+            {
+                sign: '🚸', 
+                sorani: {question: 'ئەم هێمایە ئاگاداریی چ دەدات؟', answers: ['پەڕینەوەی منداڵان', 'نزیکبوونەوە لە قوتابخانە', 'هەردووکیان'], correct: 2}, // وەڵامی گۆڕاو
+                badini: {question: 'ڤێ هێمایێ ئاگادارییا چ ددەت؟', answers: ['په‌ڕینداریا زارۆکان', 'نێزیکبوون ژ قوتابخانێ', 'هه‌ردووکان'], correct: 2},
+                arabic: {question: 'ماذا تشير هذه الإشارة؟', answers: ['عبور الأطفال', 'الاقتراب من مدرسة', 'كلاهما'], correct: 2},
+                english: {question: 'What does this sign warn about?', answers: ['Children crossing', 'Approaching a school', 'Both'], correct: 2}
+            },
+        ];
+
+
+        function selectLanguage(lang) {
+            currentLang = lang;
+            document.getElementById('langSelection').style.display = 'none';
+            document.getElementById('idEntry').style.display = 'block';
+            updateLanguage();
+        }
+
+        function updateLanguage() {
+            const t = translations[currentLang];
+            
+            document.body.setAttribute('dir', t.dir);
+            document.documentElement.setAttribute('lang', t.langCode);
+
+            document.getElementById('pageTitle').textContent = t.title;
+            document.getElementById('confirmBtn').textContent = t.confirm;
+            document.getElementById('quizTitle').textContent = t.quizTitle;
+            document.getElementById('resultTitle').textContent = t.resultTitle;
+            document.getElementById('restartBtn').textContent = t.restart;
+            
+            // گۆڕینی پەیامی دەرچوون بۆ ئەوەی نمرەی دەرچوون نیشان بدات
+            t.passed = translations[currentLang].passed.replace('${passingScore}', passingScore).replace('${score}', score);
+            t.failed = translations[currentLang].failed.replace('${passingScore}', passingScore);
+
+
+            document.getElementById('nameDisplay').textContent = t.enterName;
+            document.getElementById('verificationMessage').textContent = '';
+            document.getElementById('idDisplay').textContent = currentID || '___';
+        }
+
+
+        // --- فەنکشنی سەرەکی پیشاندانی ID و پشتڕاستکردنەوەی ناو ---
+        function updateIDDisplay() {
+            const t = translations[currentLang];
+            const nameDisplay = document.getElementById('nameDisplay');
+            const confirmBtn = document.getElementById('confirmBtn');
+            const verificationMessage = document.getElementById('verificationMessage');
+            const user = users[currentID];
+
+            document.getElementById('idDisplay').textContent = currentID || '___';
+            confirmBtn.disabled = true;
+            nameDisplay.textContent = t.enterName;
+            verificationMessage.textContent = '';
+            
+            if (user) {
+                const fullName = user[currentLang];
+                const names = fullName.split(' ');
+                
+                // دڵنیا دەبێتەوە کە ناوی سیانی هەیە (لانیکەم ٣ بەش)
+                if (names.length >= 3) {
+                    const thirdName = names[2];
+                    
+                    nameDisplay.textContent = t.thirdName(thirdName, fullName);
+                    nameDisplay.style.color = '#10b981'; 
+                    confirmBtn.disabled = false; 
+                    verificationMessage.textContent = t.verificationSuccess;
+                    verificationMessage.style.color = '#10b981';
+                } else {
+                    // ئەگەر ناوی سیانی نەبوو (پێویستە ناوی سیانی لە داتابەیسدا بێت)
+                    nameDisplay.textContent = fullName + ' (ناو تەواو نییە)';
+                    nameDisplay.style.color = '#ef4444'; 
+                    verificationMessage.textContent = "ژمارەی ناسنامە دۆزرایەوە بەڵام ناوی سیانی تەواو نییە.";
+                    verificationMessage.style.color = '#ef4444';
+                }
+            } else if (currentID.length > 0) {
+                // ئەگەر IDیەکە داخڵ کرا بەڵام نەدۆزرایەوە
+                verificationMessage.textContent = t.verificationFailed;
+                verificationMessage.style.color = '#ef4444';
+                nameDisplay.textContent = t.enterName;
+            } else {
+                // کاتێک ID بەتاڵە
+                nameDisplay.textContent = t.enterName;
+            }
+        }
+
+        function addDigit(digit) {
+            // رێگەدان بە داخڵکردنی ٥ ژمارە
+            if (currentID.length < 5) {
+                currentID += digit;
+                updateIDDisplay();
+            }
+        }
+
+        function clearEntry() {
+            currentID = '';
+            updateIDDisplay();
+        }
+
+        function backspace() {
+            currentID = currentID.slice(0, -1);
+            updateIDDisplay();
+        }
+
+        function confirmID() {
+            // تەنها کاتێک دڵنیاکردنەوە دەکات کە دوگمەکە چالاک بێت
+            if (!document.getElementById('confirmBtn').disabled) {
+                document.getElementById('idEntry').style.display = 'none';
+                document.getElementById('quizContainer').style.display = 'block';
+                startQuiz();
+            } else {
+                alert(translations[currentLang].notFound);
+            }
+        }
+
+        // --- لۆژیکی تاقیکردنەوە ---
+        function startQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            // دووبارە نوێکردنەوەی پەیامی دەرچوون لەگەڵ دەستپێکردنەوەی تاقیکردنەوەکە
+            updateLanguage(); 
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentQuestion >= totalQuestions) {
+                showResults();
+                return;
+            }
+
+            // سووڕانەوە بەسەر پرسیارەکاندا (بۆ گەیشتن بە ٢٥ پرسیار)
+            const qData = questions[currentQuestion % questions.length]; 
+            const q = qData[currentLang] || qData.sorani; 
+
+            document.getElementById('questionNumber').textContent = 
+                `${translations[currentLang].question} ${currentQuestion + 1}/${totalQuestions}`;
+            document.getElementById('trafficSign').textContent = qData.sign;
+            document.getElementById('questionText').textContent = q.question;
+            
+            const answersContainer = document.getElementById('answersContainer');
+            answersContainer.innerHTML = '';
+            
+            q.answers.forEach((answer, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = answer;
+                btn.onclick = () => selectAnswer(index);
+                answersContainer.appendChild(btn);
+            });
+
+            startTimer();
+        }
+
+        function startTimer() {
+            timeLeft = 60; // ٦٠ چرکە (خولەکێک)
+            document.getElementById('timer').textContent = timeLeft + 's';
+            
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = timeLeft + 's';
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    // بەهەڵە هەژمار دەکرێت
+                    alert(translations[currentLang].timeUp);
+                    selectAnswer(-1); 
+                }
+            }, 1000);
+        }
+
+        function selectAnswer(index) {
+            clearInterval(timerInterval);
+            
+            const qData = questions[currentQuestion % questions.length];
+            const q = qData[currentLang] || qData.sorani;
+            const buttons = document.querySelectorAll('.answer-btn');
+            
+            if (index === q.correct) {
+                score++;
+                if (index >= 0) buttons[index].classList.add('correct');
+            } else {
+                if (index >= 0) buttons[index].classList.add('wrong');
+                buttons[q.correct].classList.add('correct');
+            }
+
+            buttons.forEach(btn => btn.onclick = null);
+
+            setTimeout(() => {
+                currentQuestion++;
+                showQuestion();
+            }, 1500);
+        }
+
+        function showResults() {
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('resultContainer').style.display = 'block';
+            
+            // نوێکردنەوەی پەیامی دەرچوون بۆ نیشاندانی نمرەی دروست
+            const t = translations[currentLang];
+            t.passed = t.passed.replace('${passingScore}', passingScore).replace('${score}', score);
+            t.failed = t.failed.replace('${passingScore}', passingScore);
+
+            document.getElementById('scoreDisplay').textContent = `${score}/${totalQuestions}`;
+            
+            // --- لۆژیکی ئەنجامە نوێکراوەکان ---
+            if (score >= passingScore) {
+                document.getElementById('resultEmoji').textContent = '🥳'; 
+                document.getElementById('resultText').textContent = t.passed;
+            } else if (score >= passingScore - 3) { // بۆ نموونە: 17-19 نمرە
+                document.getElementById('resultEmoji').textContent = '🤔'; 
+                document.getElementById('resultText').textContent = t.almost;
+            } else {
+                document.getElementById('resultEmoji').textContent = '😭'; 
+                document.getElementById('resultText').textContent = t.failed;
+            }
+        }
+
+        function restart() {
+            currentID = '';
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('resultContainer').style.display = 'none';
+            document.getElementById('langSelection').style.display = 'grid';
+            // پاککردنەوەی شاشەی ID لەدوای گەڕانەوە
+            document.getElementById('idEntry').style.display = 'none'; 
+            clearEntry();
+        }
+    </script>
+</body>
+</html>
